@@ -1,7 +1,16 @@
 # VIHIMA06-hf
-Követelmények leírása: 
+
+## 1. fázis:
+
+### Követelmények leírása: 
+
 [Design wiki page](../../wiki/Követelmények)
-Design wiki page:
+
+### Design wiki page:
+
 [Design wiki page](../../wiki/Design)
-Tesztelési terv wiki page:
+
+### Tesztelési terv wiki page:
+
 [Design wiki page](../../wiki/Tesztelési-terv)
+
