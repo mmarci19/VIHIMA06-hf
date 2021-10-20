@@ -4,7 +4,7 @@
 
 ### Követelmények leírása: 
 
-[Design wiki page](../../wiki/Követelmények)
+[Követelmények wiki page](../../wiki/Követelmények)
 
 ### Design wiki page:
 
@@ -12,5 +12,5 @@
 
 ### Tesztelési terv wiki page:
 
-[Design wiki page](../../wiki/Tesztelési-terv)
+[Tesztelési terv wiki page](../../wiki/Tesztelési-terv)
 
