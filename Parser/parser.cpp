@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <string>
 #include "gif.h"
+#include <iostream>
+#include <fstream>
 
 int main()
 {
@@ -24,11 +26,10 @@ int main()
 	GifWriteFrame(&g, white.data(), width, height, delay);
 	GifEnd(&g);
 
+
+	std::ifstream stream("1.caff", std::ios::in | std::ios::binary);
+	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+
+
 	return 0;
-}
-
-int getPixelPosFromXY(int width, int height, int x, int y)
-{
-
-
 }
