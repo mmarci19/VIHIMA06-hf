@@ -38,6 +38,18 @@ int parsed_frames = 0;
 std::vector<CiffData> ciffDatas;
 
 
+long long int readnum(vector<int> be, int bajthossz) {
+    long long int count = 0;
+    for(int i=bajthossz-1; i>=0; i--) {
+        int egesz = be[i]/16;
+        int egyes = be[i] - egesz*16;
+        count += pow(16,2*i+1) * egesz;
+        count += pow(16,2*i) * egyes;
+    }
+    return count;
+}
+
+
 
 // Source: https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
 static std::string base64_encode(const std::string& in) {
@@ -85,11 +97,75 @@ string getJsonData() {
 		result += "]}";
 	}
 	result += "]}";
-
-
-
 	return result;
 }
+
+
+CiffData CiffParse(std::vector<uint8_t> contents, long long int start){
+    int bytecount = start + 4;     //CIFF átugrása
+    //read header size
+    std::vector<int> buff = {};
+    for (int i=bytecount; i<bytecount+8; ++i) {
+        int i2 = contents[i];
+        buff.push_back(i2);
+    }
+    bytecount = bytecount + 8;
+    long long int header_size = readnum(buff,8);
+    buff = {};
+    for (int i=bytecount; i<bytecount+8; ++i) {
+        int i2 = contents[i];
+        buff.push_back(i2);
+    }
+    bytecount = bytecount + 8;
+    long long int content_size = readnum(buff,8);
+    buff = {};
+
+    for (int i=bytecount; i<bytecount+8; ++i) {
+        int i2 = contents[i];
+        buff.push_back(i2);
+    }
+    bytecount = bytecount + 8;
+    long long int width = readnum(buff,8);
+    buff = {};
+
+    for (int i=bytecount; i<bytecount+8; ++i) {
+        int i2 = contents[i];
+        buff.push_back(i2);
+    }
+    bytecount = bytecount + 8;
+    long long int height = readnum(buff,8);
+    buff = {};
+    cout << "header s: " << header_size << " cont " << content_size << " width: " << width << " height: " << height;
+    int eleje = bytecount;
+    for(bytecount; !(contents[bytecount] == 0x0A); bytecount++) {
+
+    }
+    //TODO kivágni és to string: contents[eleje]-tól contents[bytecount]-ig.
+
+    std::vector<uint8_t> kep = {};
+    int alpha = 2;
+    for(long long int i=header_size;i<header_size+content_size;i++) {
+        if(alpha==2) {
+            alpha = 0;
+        }
+        else {
+            alpha++;
+        }
+        kep.push_back(contents[i]);
+        if(alpha == 2) {
+            kep.push_back(int8_t(255));
+        }
+    }
+    struct CiffData kimenet;
+    kimenet.height = height;
+    kimenet.width = width;
+    kimenet.caption = "teszt"; //TODO
+    kimenet.pixeldata = kep;
+    std::vector<std::string> tags = {}; //TODO
+    kimenet.tags = tags;
+    return kimenet;
+}
+
 
 
 long long readBytesAsInt(long startIndex, int length)
@@ -143,12 +219,9 @@ void read_caff_animation_data(long startIndex)
 	CiffData ciffdata;
 
 	// TODO itt egy CiffData structtal visszatérő függvény állítsa be a caff datát (caffFileData[startIndex] + 8 -nál kezdődik a CIFF data)
-	ciffdata.height = 12345;
+	startIndex += 8;
+	ciffdata = CiffParse(caffFileData, startIndex);
 	ciffdata.tags.push_back("asd");
-
-
-
-
 	ciffdata.duration_milisecs = duration_milisecs;
 	ciffDatas.push_back(ciffdata);
 }
@@ -203,9 +276,10 @@ int read_block(long startIndex)
 
 
 
+
 int main()
 {
-	std::ifstream stream("1_mod.caff", std::ios::in | std::ios::binary);
+	std::ifstream stream("3.caff", std::ios::in | std::ios::binary);
 	caffFileData = std::vector<uint8_t>(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 	long long fileByteCount = caffFileData.size();
 	long long position = 0;
@@ -224,11 +298,13 @@ int main()
 	GifWriter g;
 	if (ciffDatas.size() > 0) {
 		CiffData cd = ciffDatas[0];
-		GifBegin(&g, "outgif.gif", cd.width, cd.height, cd.duration_milisecs);
+		GifBegin(&g, "outgif.gif", 1000, 667, 100);
 	}
-	for (int i = 1; i < ciffDatas.size(); i++) {
+	for (int i = 0; i < ciffDatas.size(); i++) {
 		CiffData cd = ciffDatas[i];
-		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs);
+		//GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs);
+		GifWriteFrame(&g, cd.pixeldata.data(), 1000, 667 , 100);
+		cout << endl << "Duration:" << cd.duration_milisecs << "capt: " << cd.caption;
 	}
 	GifEnd(&g);
 
