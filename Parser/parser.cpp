@@ -37,25 +37,12 @@ int parsed_frames = 0;
 
 std::vector<CiffData> ciffDatas;
 
-
-long long int readnum(vector<int> be, int bajthossz) {
-	long long int count = 0;
-	for (int i = bajthossz - 1; i >= 0; i--) {
-		int egesz = be[i] / 16;
-		int egyes = be[i] - egesz * 16;
-		count += pow(16, 2 * i + 1) * egesz;
-		count += pow(16, 2 * i) * egyes;
-	}
-	return count;
-}
-
-
 long long readBytesAsInt(long startIndex, int length)
 {
 	long long result = 0;
 	long long pos = 0;
 	for (long i = startIndex; i < startIndex + length; i++) {
-		result += ((long long)caffFileData[i]) << (pos * 8);
+		result += ((long long)caffFileData.at(i)) << (pos * 8);
 		pos++;
 	}
 	return result;
@@ -65,13 +52,11 @@ string readBytesAsString(long startIndex, int length)
 {
 	string result = "";
 	for (long i = startIndex; i < startIndex + length; i++) {
-		char c = (char)caffFileData[i];
+		char c = (char)caffFileData.at(i);
 		result += c;
 	}
 	return result;
 }
-
-
 
 
 // Source: https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
@@ -91,6 +76,11 @@ static std::string base64_encode(const std::string& in) {
 	if (valb > -6) out.push_back("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[((val << 8) >> (valb + 8)) & 0x3F]);
 	while (out.size() % 4) out.push_back('=');
 	return out;
+}
+
+void parsing_error(string message) {	
+	cerr << message << std::endl;
+	throw "error";
 }
 
 
@@ -116,7 +106,6 @@ string getJsonData() {
 		for (int j = 0; j < ciffData.tags.size(); j++) {
 			result += "\"" + base64_encode(ciffData.tags[j]) + "\",";
 		}
-
 		result += "]},";
 	}
 	result += "]}";
@@ -125,8 +114,8 @@ string getJsonData() {
 
 
 CiffData CiffParse(long long startIndex) {
-	if (!(caffFileData[startIndex] == 'C' && caffFileData[startIndex + 1] == 'I' && caffFileData[startIndex + 2] == 'F' && caffFileData[startIndex + 3] == 'F')) {
-		cerr << "CIFF magic string not present!" << std::endl;
+	if (!(caffFileData.at(startIndex) == 'C' && caffFileData.at(startIndex + 1) == 'I' && caffFileData.at(startIndex + 2) == 'F' && caffFileData.at(startIndex + 3) == 'F')) {		
+		parsing_error("CIFF magic string not present!");
 	}
 
 	long long header_size = readBytesAsInt(startIndex + 4, 8);
@@ -136,22 +125,22 @@ CiffData CiffParse(long long startIndex) {
 	long long height = readBytesAsInt(startIndex + 28, 8);
 	long long currentPosition = startIndex + 36;
 	string caption = "";
-	for (currentPosition; !(caffFileData[currentPosition] == 0x0A); currentPosition++) {
-		caption += caffFileData[currentPosition];
+	for (currentPosition; !(caffFileData.at(currentPosition) == 0x0A); currentPosition++) {
+		caption += caffFileData.at(currentPosition);
 	}
 	currentPosition++;
 	std::vector<string> tags;
 	string tag = "";
 	for (long long i = currentPosition; i < header_end; i++) {
 
-		if (caffFileData[i] == '\0')
+		if (caffFileData.at(i) == '\0')
 		{
 			tags.push_back(tag);
 			tag = "";
 		}
 		else
 		{
-			tag += caffFileData[i];
+			tag += caffFileData.at(i);
 		}
 	}
 	std::vector<uint8_t> kep = {};
@@ -163,7 +152,7 @@ CiffData CiffParse(long long startIndex) {
 		else {
 			alpha++;
 		}
-		kep.push_back(caffFileData[i]);
+		kep.push_back(caffFileData.at(i));
 		if (alpha == 2) {
 			kep.push_back(int8_t(255));
 		}
@@ -178,11 +167,10 @@ CiffData CiffParse(long long startIndex) {
 }
 
 
-
 void read_caff_header_data(long startIndex)
 {
-	if (!(caffFileData[startIndex] == 'C' && caffFileData[startIndex + 1] == 'A' && caffFileData[startIndex + 2] == 'F' && caffFileData[startIndex + 3] == 'F')) {
-		cerr << "CAFF magic string missing!" << std::endl;
+	if (!(caffFileData.at(startIndex) == 'C' && caffFileData.at(startIndex + 1) == 'A' && caffFileData.at(startIndex + 2) == 'F' && caffFileData.at(startIndex + 3) == 'F')) {		
+		parsing_error("CAFF magic string missing!");
 	}
 	long long caff_header_size = readBytesAsInt(startIndex + 4, 8);
 	num_anim = readBytesAsInt(startIndex + 12, 8);
@@ -205,7 +193,7 @@ void read_caff_animation_data(long startIndex)
 	long long duration_milisecs = readBytesAsInt(startIndex, 8);
 	CiffData ciffdata;
 
-	// TODO itt egy CiffData structtal visszatérő függvény állítsa be a caff datát (caffFileData[startIndex] + 8 -nál kezdődik a CIFF data)
+	// TODO itt egy CiffData structtal visszatérő függvény állítsa be a caff datát (caffFileData.at(startIndex] + 8 -nál kezdődik a CIFF data)
 	startIndex += 8;
 	ciffdata = CiffParse(startIndex);
 	ciffdata.tags.push_back("asd");
@@ -214,7 +202,7 @@ void read_caff_animation_data(long startIndex)
 }
 
 Blockheader read_block_header(int startIndex) {
-	int blocktype = (int)caffFileData[startIndex];
+	int blocktype = (int)caffFileData.at(startIndex);
 	long long blocklength = readBytesAsInt(startIndex + 1, 8);
 	Blockheader result;
 	result.blocktype = blocktype;
@@ -229,7 +217,7 @@ int read_block(long startIndex)
 	if (blockheader.blocktype == 1) {
 		if (header_parsed)
 		{
-			cerr << "There's more than 1 header block" << std::endl;
+			parsing_error("There's more than 1 header block");
 		}
 		header_parsed = true;
 		read_caff_header_data(startIndex + 9);
@@ -237,11 +225,11 @@ int read_block(long startIndex)
 	else if (blockheader.blocktype == 2) {
 		if (!header_parsed)
 		{
-			cerr << "The first block must be header block!" << std::endl;
+			parsing_error("The first block must be header block!");
 		}
 		if (credits_parsed)
 		{
-			cerr << "There's more than 1 credits block!" << std::endl;
+			parsing_error("There's more than 1 credits block!");
 		}
 
 		credits_parsed = true;
@@ -250,17 +238,16 @@ int read_block(long startIndex)
 	else if (blockheader.blocktype == 3) {
 		if (!header_parsed)
 		{
-			cerr << "The first block must be header block!" << std::endl;
+			parsing_error("The first block must be header block!");
 		}
 		read_caff_animation_data(startIndex + 9);
 		parsed_frames++;
 	}
 	else {
-		cerr << "The block type must be 1, 2 or 3!" << std::endl;
+		parsing_error("The block type must be 1, 2 or 3!");
 	}
 	return startIndex + 9 + blockheader.blocklength;
 }
-
 
 
 void convert_caff(string filename) {
@@ -273,7 +260,7 @@ void convert_caff(string filename) {
 	} while (position < fileByteCount);
 
 	if (parsed_frames != num_anim) {
-		cerr << "Num_anim does not match CIFF blocks count" << std::endl;
+		parsing_error("Num_anim does not match CIFF blocks count");
 	}
 	string json = getJsonData();
 	std::ofstream outfile("out.json");
@@ -292,16 +279,26 @@ void convert_caff(string filename) {
 	GifEnd(&g);
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	string filename = "1.caff";
+	string filename = "";
+	if (argc >= 2)
+	{
+		filename = argv[1];
+	}
+	else
+	{
+		cerr << "No file given!" << std::endl;
+	}
+
 	try
 	{
 		convert_caff(filename);
+		cout << "CONVERSION SUCCESFUL";
 	}
-	catch (const std::exception& e)
+	catch (...)
 	{
-		cerr << "Parsing error!";
+		cerr << "Parsing error!" << std::endl;
 	}
 
 	return 0;
