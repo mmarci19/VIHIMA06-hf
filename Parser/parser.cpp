@@ -8,6 +8,21 @@ using namespace std;
 
 
 
+
+struct Blockheader {
+	int blocktype;
+	long long blocklength;
+};
+
+struct CiffData {
+	long long width;
+	long long height;
+	long long duration_milisecs;
+	string caption;
+	std::vector<string> tags;
+	std::vector<uint8_t> pixeldata;
+};
+
 std::vector<uint8_t> caffFileData;
 long long num_anim = 0;
 long long year = 0;
@@ -19,6 +34,8 @@ string creator = "";
 bool header_parsed = false;
 bool credits_parsed = false;
 int parsed_frames = 0;
+
+std::vector<CiffData> ciffDatas;
 
 
 
@@ -43,8 +60,34 @@ static std::string base64_encode(const std::string& in) {
 
 
 string getJsonData() {
+
 	string result = "";
-	result += "{numAnim:" + num_anim + "}";
+	result += "{ \"numAnim\":" + std::to_string(num_anim);
+	result += ", \"year\":" + std::to_string(year);
+	result += ", \"month\":" + std::to_string(month);
+	result += ", \"day\":" + std::to_string(day);
+	result += ", \"hour\":" + std::to_string(hour);
+	result += ", \"minute\":" + std::to_string(minute);
+	result += ", \"creatorB64\":\"" + base64_encode(creator) + "\"";
+
+	result += ", \"ciffs\":[";
+	for (int i = 0; i < ciffDatas.size(); i++) {
+		CiffData ciffData = ciffDatas[i];
+		result += "{ \"duration\":" + std::to_string(ciffData.duration_milisecs);
+		result += ", \"width\":" + std::to_string(ciffData.width);
+		result += ", \"height\":" + std::to_string(ciffData.height);
+		result += ", \"captionB64\":\"" + base64_encode(ciffData.caption) + "\"";
+		result += ", \"tagB64s\":[";
+		for (int j = 0; j < ciffData.tags.size(); j++) {
+			result += "\"" + base64_encode(ciffData.tags[j]) + "\",";
+		}
+
+		result += "]}";
+	}
+	result += "]}";
+
+
+
 	return result;
 }
 
@@ -70,10 +113,6 @@ string readBytesAsString(long startIndex, int length)
 	return result;
 }
 
-struct Blockheader {
-	int blocktype;
-	long long blocklength;
-};
 
 
 void read_caff_header_data(long startIndex)
@@ -101,7 +140,17 @@ void read_caff_credits_data(long startIndex)
 void read_caff_animation_data(long startIndex)
 {
 	long long duration_milisecs = readBytesAsInt(startIndex, 8);
-	cerr << "TODO";
+	CiffData ciffdata;
+
+	// TODO itt egy CiffData structtal visszatérő függvény állítsa be a caff datát (caffFileData[startIndex] + 8 -nál kezdődik a CIFF data)
+	ciffdata.height = 12345;
+	ciffdata.tags.push_back("asd");
+
+
+
+
+	ciffdata.duration_milisecs = duration_milisecs;
+	ciffDatas.push_back(ciffdata);
 }
 
 Blockheader read_block_header(int startIndex) {
@@ -156,20 +205,6 @@ int read_block(long startIndex)
 
 int main()
 {
-	int width = 100;
-	int height = 200;
-	std::vector<uint8_t> black(width * height * 4, 0);
-	std::vector<uint8_t> white(width * height * 4, 255);
-
-	auto fileName = "bwgif.gif";
-	int delay = 100;
-	GifWriter g;
-	GifBegin(&g, fileName, width, height, delay);
-	GifWriteFrame(&g, black.data(), width, height, delay);
-	GifWriteFrame(&g, white.data(), width, height, delay);
-	GifEnd(&g);
-
-
 	std::ifstream stream("1_mod.caff", std::ios::in | std::ios::binary);
 	caffFileData = std::vector<uint8_t>(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 	long long fileByteCount = caffFileData.size();
@@ -178,8 +213,24 @@ int main()
 		position = read_block(position);
 	} while (position < fileByteCount);
 
+	if (parsed_frames != num_anim) {
+		cerr << "Num_anim does not match CIFF blocks count";
+	}
+	string json = getJsonData();
+	std::ofstream outfile("out.json");
+	outfile << json;
 
-	uint8_t elsoByte = caffFileData[0];
+	// TODO ha 0 frame?
+	GifWriter g;
+	if (ciffDatas.size() > 0) {
+		CiffData cd = ciffDatas[0];
+		GifBegin(&g, "outgif.gif", cd.width, cd.height, cd.duration_milisecs);
+	}
+	for (int i = 1; i < ciffDatas.size(); i++) {
+		CiffData cd = ciffDatas[i];
+		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs);
+	}
+	GifEnd(&g);
 
 	return 0;
 }
