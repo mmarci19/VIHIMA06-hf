@@ -265,8 +265,10 @@ void convert_caff(string filename) {
 	string json = getJsonData();
 	std::ofstream outfile("out.json");
 	outfile << json;
-
-	// TODO ha 0 frame?
+	if (ciffDatas.size() == 0)
+	{
+		parsing_error("CAFF has 0 frames!");
+	}
 	GifWriter g;
 	if (ciffDatas.size() > 0) {
 		CiffData cd = ciffDatas[0];
