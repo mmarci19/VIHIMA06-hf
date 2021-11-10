@@ -94,7 +94,7 @@ string getJsonData() {
 			result += "\"" + base64_encode(ciffData.tags[j]) + "\",";
 		}
 
-		result += "]}";
+		result += "]},";
 	}
 	result += "]}";
 	return result;
@@ -102,49 +102,69 @@ string getJsonData() {
 
 
 CiffData CiffParse(std::vector<uint8_t> contents, long long start) {
-	long long  bytecount = start + 4;     //CIFF átugrása
-	//read header size
+	long long  currentPosition = start + 4;     //CIFF átugrása
+
 	std::vector<int> buff = {};
-	for (long long i = bytecount; i < bytecount + 8; ++i) {
+	
+
+	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
 		int i2 = contents[i];
 		buff.push_back(i2);
 	}
-	bytecount = bytecount + 8;
+
+	currentPosition = currentPosition + 8;
 	long long header_size = readnum(buff, 8);
+
+	long long header_end = start + header_size;
 	buff = {};
-	for (long long  i = bytecount; i < bytecount + 8; ++i) {
+	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
 		int i2 = contents[i];
 		buff.push_back(i2);
 	}
-	bytecount = bytecount + 8;
+	currentPosition = currentPosition + 8;
 	long long content_size = readnum(buff, 8);
 	buff = {};
 
-	for (long long  i = bytecount; i < bytecount + 8; ++i) {
+	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
 		int i2 = contents[i];
 		buff.push_back(i2);
 	}
-	bytecount = bytecount + 8;
+	currentPosition = currentPosition + 8;
 	long long width = readnum(buff, 8);
 	buff = {};
 
-	for (long long i = bytecount; i < bytecount + 8; ++i) {
+	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
 		int i2 = contents[i];
 		buff.push_back(i2);
 	}
-	bytecount = bytecount + 8;
+	currentPosition = currentPosition + 8;
 	long long height = readnum(buff, 8);
 	buff = {};
 	cout << "header s: " << header_size << " cont " << content_size << " width: " << width << " height: " << height;
-	long long eleje = bytecount;
-	for (bytecount; !(contents[bytecount] == 0x0A); bytecount++) {
+	long long eleje = currentPosition;
 
+	string caption = "";
+	for (currentPosition; !(contents[currentPosition] == 0x0A); currentPosition++) {
+		caption += contents[currentPosition];
 	}
-	//TODO kivágni és to string: contents[eleje]-tól contents[bytecount]-ig.
-
+	currentPosition++;
+	std::vector<string> tags;
+	string tag = "";
+	for (long long i = currentPosition; i < header_end; i++) {
+		
+		if (contents[i]== '\0')
+		{
+			tags.push_back(tag);
+			tag = "";
+		}
+		else
+		{
+			tag += contents[i];
+		}
+	}
 	std::vector<uint8_t> kep = {};
 	int alpha = 2;
-	for (long long int i = start+header_size; i < start+header_size + content_size; i++) {
+	for (long long int i = start + header_size; i < start + header_size + content_size; i++) {
 		if (alpha == 2) {
 			alpha = 0;
 		}
@@ -159,9 +179,8 @@ CiffData CiffParse(std::vector<uint8_t> contents, long long start) {
 	struct CiffData kimenet;
 	kimenet.height = height;
 	kimenet.width = width;
-	kimenet.caption = "teszt"; //TODO
-	kimenet.pixeldata = kep;
-	std::vector<std::string> tags = {}; //TODO
+	kimenet.caption = caption;
+	kimenet.pixeldata = kep;	
 	kimenet.tags = tags;
 	return kimenet;
 }
@@ -277,9 +296,10 @@ int read_block(long startIndex)
 
 
 
+
 int main()
 {
-	std::ifstream stream("3.caff", std::ios::in | std::ios::binary);
+	std::ifstream stream("1.caff", std::ios::in | std::ios::binary);
 	caffFileData = std::vector<uint8_t>(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 	long long fileByteCount = caffFileData.size();
 	long long position = 0;
@@ -299,11 +319,11 @@ int main()
 	if (ciffDatas.size() > 0) {
 		CiffData cd = ciffDatas[0];
 		//GifBegin(&g, "outgif.gif", 1000, 667, 100);
-		GifBegin(&g, "outgif.gif", cd.width, cd.height, cd.duration_milisecs/10);
+		GifBegin(&g, "outgif.gif", cd.width, cd.height, cd.duration_milisecs / 10);
 	}
 	for (int i = 0; i < ciffDatas.size(); i++) {
 		CiffData cd = ciffDatas[i];
-		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs/10);
+		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs / 10);
 		//GifWriteFrame(&g, cd.pixeldata.data(), 1000, 667, 100);
 		cout << endl << "Duration:" << cd.duration_milisecs << "capt: " << cd.caption;
 	}
