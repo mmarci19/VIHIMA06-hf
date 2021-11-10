@@ -50,6 +50,29 @@ long long int readnum(vector<int> be, int bajthossz) {
 }
 
 
+long long readBytesAsInt(long startIndex, int length)
+{
+	long long result = 0;
+	long long pos = 0;
+	for (long i = startIndex; i < startIndex + length; i++) {
+		result += ((long long)caffFileData[i]) << (pos * 8);
+		pos++;
+	}
+	return result;
+}
+
+string readBytesAsString(long startIndex, int length)
+{
+	string result = "";
+	for (long i = startIndex; i < startIndex + length; i++) {
+		char c = (char)caffFileData[i];
+		result += c;
+	}
+	return result;
+}
+
+
+
 
 // Source: https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
 static std::string base64_encode(const std::string& in) {
@@ -101,77 +124,46 @@ string getJsonData() {
 }
 
 
-CiffData CiffParse(std::vector<uint8_t> contents, long long start) {
-	long long  currentPosition = start + 4;     //CIFF átugrása
-
-	std::vector<int> buff = {};
-	
-
-	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
-		int i2 = contents[i];
-		buff.push_back(i2);
+CiffData CiffParse(long long startIndex) {
+	if (!(caffFileData[startIndex] == 'C' && caffFileData[startIndex + 1] == 'I' && caffFileData[startIndex + 2] == 'F' && caffFileData[startIndex + 3] == 'F')) {
+		cerr << "CIFF magic string not present!" << std::endl;
 	}
 
-	currentPosition = currentPosition + 8;
-	long long header_size = readnum(buff, 8);
-
-	long long header_end = start + header_size;
-	buff = {};
-	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
-		int i2 = contents[i];
-		buff.push_back(i2);
-	}
-	currentPosition = currentPosition + 8;
-	long long content_size = readnum(buff, 8);
-	buff = {};
-
-	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
-		int i2 = contents[i];
-		buff.push_back(i2);
-	}
-	currentPosition = currentPosition + 8;
-	long long width = readnum(buff, 8);
-	buff = {};
-
-	for (long long i = currentPosition; i < currentPosition + 8; ++i) {
-		int i2 = contents[i];
-		buff.push_back(i2);
-	}
-	currentPosition = currentPosition + 8;
-	long long height = readnum(buff, 8);
-	buff = {};
-	cout << "header s: " << header_size << " cont " << content_size << " width: " << width << " height: " << height;
-	long long eleje = currentPosition;
-
+	long long header_size = readBytesAsInt(startIndex + 4, 8);
+	long long header_end = startIndex + header_size;
+	long long content_size = readBytesAsInt(startIndex + 12, 8);
+	long long width = readBytesAsInt(startIndex + 20, 8);
+	long long height = readBytesAsInt(startIndex + 28, 8);
+	long long currentPosition = startIndex + 36;
 	string caption = "";
-	for (currentPosition; !(contents[currentPosition] == 0x0A); currentPosition++) {
-		caption += contents[currentPosition];
+	for (currentPosition; !(caffFileData[currentPosition] == 0x0A); currentPosition++) {
+		caption += caffFileData[currentPosition];
 	}
 	currentPosition++;
 	std::vector<string> tags;
 	string tag = "";
 	for (long long i = currentPosition; i < header_end; i++) {
-		
-		if (contents[i]== '\0')
+
+		if (caffFileData[i] == '\0')
 		{
 			tags.push_back(tag);
 			tag = "";
 		}
 		else
 		{
-			tag += contents[i];
+			tag += caffFileData[i];
 		}
 	}
 	std::vector<uint8_t> kep = {};
 	int alpha = 2;
-	for (long long int i = start + header_size; i < start + header_size + content_size; i++) {
+	for (long long int i = startIndex + header_size; i < startIndex + header_size + content_size; i++) {
 		if (alpha == 2) {
 			alpha = 0;
 		}
 		else {
 			alpha++;
 		}
-		kep.push_back(contents[i]);
+		kep.push_back(caffFileData[i]);
 		if (alpha == 2) {
 			kep.push_back(int8_t(255));
 		}
@@ -180,32 +172,9 @@ CiffData CiffParse(std::vector<uint8_t> contents, long long start) {
 	kimenet.height = height;
 	kimenet.width = width;
 	kimenet.caption = caption;
-	kimenet.pixeldata = kep;	
+	kimenet.pixeldata = kep;
 	kimenet.tags = tags;
 	return kimenet;
-}
-
-
-
-long long readBytesAsInt(long startIndex, int length)
-{
-	long long result = 0;
-	long long pos = 0;
-	for (long i = startIndex; i < startIndex + length; i++) {
-		result += ((long long)caffFileData[i]) << (pos * 8);
-		pos++;
-	}
-	return result;
-}
-
-string readBytesAsString(long startIndex, int length)
-{
-	string result = "";
-	for (long i = startIndex; i < startIndex + length; i++) {
-		char c = (char)caffFileData[i];
-		result += c;
-	}
-	return result;
 }
 
 
@@ -213,11 +182,10 @@ string readBytesAsString(long startIndex, int length)
 void read_caff_header_data(long startIndex)
 {
 	if (!(caffFileData[startIndex] == 'C' && caffFileData[startIndex + 1] == 'A' && caffFileData[startIndex + 2] == 'F' && caffFileData[startIndex + 3] == 'F')) {
-		cerr << "CAFF magic string missing!";
+		cerr << "CAFF magic string missing!" << std::endl;
 	}
-	long long caff_header_size = readBytesAsInt(startIndex + 4, 8); // ez amúgy tök fölös?
+	long long caff_header_size = readBytesAsInt(startIndex + 4, 8);
 	num_anim = readBytesAsInt(startIndex + 12, 8);
-	cout << "num_anim:" << (int)num_anim << std::endl;
 }
 
 void read_caff_credits_data(long startIndex)
@@ -239,7 +207,7 @@ void read_caff_animation_data(long startIndex)
 
 	// TODO itt egy CiffData structtal visszatérő függvény állítsa be a caff datát (caffFileData[startIndex] + 8 -nál kezdődik a CIFF data)
 	startIndex += 8;
-	ciffdata = CiffParse(caffFileData, startIndex);
+	ciffdata = CiffParse(startIndex);
 	ciffdata.tags.push_back("asd");
 	ciffdata.duration_milisecs = duration_milisecs;
 	ciffDatas.push_back(ciffdata);
@@ -261,7 +229,7 @@ int read_block(long startIndex)
 	if (blockheader.blocktype == 1) {
 		if (header_parsed)
 		{
-			cerr << "There's more than 1 header block";
+			cerr << "There's more than 1 header block" << std::endl;
 		}
 		header_parsed = true;
 		read_caff_header_data(startIndex + 9);
@@ -269,11 +237,11 @@ int read_block(long startIndex)
 	else if (blockheader.blocktype == 2) {
 		if (!header_parsed)
 		{
-			cerr << "The first block must be header block!";
+			cerr << "The first block must be header block!" << std::endl;
 		}
 		if (credits_parsed)
 		{
-			cerr << "There's more than 1 credits block!";
+			cerr << "There's more than 1 credits block!" << std::endl;
 		}
 
 		credits_parsed = true;
@@ -282,13 +250,13 @@ int read_block(long startIndex)
 	else if (blockheader.blocktype == 3) {
 		if (!header_parsed)
 		{
-			cerr << "The first block must be header block!";
+			cerr << "The first block must be header block!" << std::endl;
 		}
 		read_caff_animation_data(startIndex + 9);
 		parsed_frames++;
 	}
 	else {
-		cerr << "The block type must be 1, 2 or 3!";
+		cerr << "The block type must be 1, 2 or 3!" << std::endl;
 	}
 	return startIndex + 9 + blockheader.blocklength;
 }
@@ -308,7 +276,7 @@ int main()
 	} while (position < fileByteCount);
 
 	if (parsed_frames != num_anim) {
-		cerr << "Num_anim does not match CIFF blocks count";
+		cerr << "Num_anim does not match CIFF blocks count" << std::endl;
 	}
 	string json = getJsonData();
 	std::ofstream outfile("out.json");
@@ -318,14 +286,11 @@ int main()
 	GifWriter g;
 	if (ciffDatas.size() > 0) {
 		CiffData cd = ciffDatas[0];
-		//GifBegin(&g, "outgif.gif", 1000, 667, 100);
 		GifBegin(&g, "outgif.gif", cd.width, cd.height, cd.duration_milisecs / 10);
 	}
 	for (int i = 0; i < ciffDatas.size(); i++) {
 		CiffData cd = ciffDatas[i];
 		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs / 10);
-		//GifWriteFrame(&g, cd.pixeldata.data(), 1000, 667, 100);
-		cout << endl << "Duration:" << cd.duration_milisecs << "capt: " << cd.caption;
 	}
 	GifEnd(&g);
 
