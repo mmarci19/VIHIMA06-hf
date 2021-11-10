@@ -263,11 +263,8 @@ int read_block(long startIndex)
 
 
 
-
-
-int main()
-{
-	std::ifstream stream("1.caff", std::ios::in | std::ios::binary);
+void convert_caff(string filename) {
+	std::ifstream stream(filename, std::ios::in | std::ios::binary);
 	caffFileData = std::vector<uint8_t>(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
 	long long fileByteCount = caffFileData.size();
 	long long position = 0;
@@ -293,6 +290,19 @@ int main()
 		GifWriteFrame(&g, cd.pixeldata.data(), cd.width, cd.height, cd.duration_milisecs / 10);
 	}
 	GifEnd(&g);
+}
+
+int main()
+{
+	string filename = "1.caff";
+	try
+	{
+		convert_caff(filename);
+	}
+	catch (const std::exception& e)
+	{
+		cerr << "Parsing error!";
+	}
 
 	return 0;
 }
