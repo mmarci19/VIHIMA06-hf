@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
 namespace CaffStore.Bll.Interfaces
 {
-    internal interface IStoreService
+    public interface IStoreService
     {
+        Task Upload(IFormFile file);
     }
 }

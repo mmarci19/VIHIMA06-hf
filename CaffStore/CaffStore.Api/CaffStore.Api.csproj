@@ -20,7 +20,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CaffStore.Bll\CaffStore.Bll.csproj" />
 		<ProjectReference Include="..\CaffStore.Dal\CaffStore.Dal.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="StaticFiles\" />
 	</ItemGroup>
 
 	<Target Name="NSwag" AfterTargets="Build">

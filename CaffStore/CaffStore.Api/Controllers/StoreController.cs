@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CaffStore.Bll.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CaffStore.Api.Controllers
@@ -9,16 +10,32 @@ namespace CaffStore.Api.Controllers
     [ApiController]
     public class StoreController : ControllerBase
     {
-        public async Task<ActionResult> Upload(IFormFile file)
-        {
-            using (var stream = System.IO.File.Create($"{ file.Name}.gif"))
-            {
-                await file.CopyToAsync(stream);
-            }
+        private readonly IStoreService service;
 
-            return Ok();
+        public StoreController(IStoreService service)
+        {
+            this.service = service;
         }
 
+        [HttpPost("upload"), DisableRequestSizeLimit]
+        public async Task<IActionResult> UploadAsync()
+        {
+            try
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+
+                await service.Upload(file);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet("{id}")]
         public async Task<ActionResult> Download(Guid id)
         {
             return Ok();

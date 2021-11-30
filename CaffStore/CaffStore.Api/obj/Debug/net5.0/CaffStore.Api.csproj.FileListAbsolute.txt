@@ -93,3 +93,8 @@ C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\obj\Debug\net5.0
 C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\obj\Debug\net5.0\ref\CaffStore.Api.dll
 C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\obj\Debug\net5.0\CaffStore.Api.pdb
 C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\obj\Debug\net5.0\CaffStore.Api.genruntimeconfig.cache
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\bin\Debug\net5.0\Microsoft.AspNetCore.Http.Features.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\bin\Debug\net5.0\Microsoft.Extensions.Primitives.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\bin\Debug\net5.0\System.IO.Pipelines.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\bin\Debug\net5.0\CaffStore.Bll.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Api\bin\Debug\net5.0\CaffStore.Bll.pdb
