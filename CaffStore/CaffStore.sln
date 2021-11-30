@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaffStore.Bll", "CaffStore.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaffStore.Dal", "CaffStore.Dal\CaffStore.Dal.csproj", "{495B73A3-036F-42D4-82BC-BBA9F683E996}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaffStore.IdentityProvider", "CaffStore.IdentityProvider\CaffStore.IdentityProvider.csproj", "{BDC263AB-CBF6-4448-9650-131F3FB8A112}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaffStore.IdentityProvider", "CaffStore.IdentityProvider\CaffStore.IdentityProvider.csproj", "{5B1271E4-942B-4555-BFAE-95914FD3F7A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{495B73A3-036F-42D4-82BC-BBA9F683E996}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{495B73A3-036F-42D4-82BC-BBA9F683E996}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{495B73A3-036F-42D4-82BC-BBA9F683E996}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDC263AB-CBF6-4448-9650-131F3FB8A112}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDC263AB-CBF6-4448-9650-131F3FB8A112}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDC263AB-CBF6-4448-9650-131F3FB8A112}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDC263AB-CBF6-4448-9650-131F3FB8A112}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B1271E4-942B-4555-BFAE-95914FD3F7A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1271E4-942B-4555-BFAE-95914FD3F7A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1271E4-942B-4555-BFAE-95914FD3F7A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1271E4-942B-4555-BFAE-95914FD3F7A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

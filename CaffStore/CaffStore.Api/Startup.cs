@@ -22,7 +22,7 @@ namespace CaffStore.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(opt =>
+            services.AddDbContext<StoreDbContext>(opt =>
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
@@ -95,7 +95,7 @@ namespace CaffStore.Api
                 .GetRequiredService<IServiceScopeFactory>()
                 .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetService<StoreDbContext>())
                 {
                     context.Database.Migrate();
                 }
