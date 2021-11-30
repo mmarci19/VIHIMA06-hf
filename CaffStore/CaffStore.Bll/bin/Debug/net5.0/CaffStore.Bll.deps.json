@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "CaffStore.Bll/1.0.0": {
+        "runtime": {
+          "CaffStore.Bll.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "CaffStore.Bll/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

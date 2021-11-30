@@ -1,0 +1,12 @@
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\bin\Debug\net5.0\CaffStore.Dal.deps.json
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\bin\Debug\net5.0\CaffStore.Dal.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\bin\Debug\net5.0\ref\CaffStore.Dal.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\bin\Debug\net5.0\CaffStore.Dal.pdb
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.csproj.AssemblyReference.cache
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.AssemblyInfoInputs.cache
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.AssemblyInfo.cs
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.csproj.CoreCompileInputs.cache
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\ref\CaffStore.Dal.dll
+C:\Users\Tuska\source\repos\VIHIMA06-hf\CaffStore\CaffStore.Dal\obj\Debug\net5.0\CaffStore.Dal.pdb
