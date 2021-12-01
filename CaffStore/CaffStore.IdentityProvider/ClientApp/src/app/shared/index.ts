@@ -122,8 +122,10 @@ export class StoreClient {
         return _observableOf<FileResponse>(<any>null);
     }
 
-    browseImages(): Observable<UploadedImagesResponseDto[]> {
-        let url_ = this.baseUrl + "/api/Store/all";
+    browseImages(filter: string | null | undefined): Observable<UploadedImagesResponseDto[]> {
+        let url_ = this.baseUrl + "/api/Store/all?";
+        if (filter !== undefined && filter !== null)
+            url_ += "filter=" + encodeURIComponent("" + filter) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {

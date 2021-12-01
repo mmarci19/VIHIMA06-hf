@@ -8,6 +8,6 @@ namespace CaffStore.Bll.Interfaces
     public interface IStoreService
     {
         Task Upload(IFormFile file);
-        Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages();
+        Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages(string filter);
     }
 }

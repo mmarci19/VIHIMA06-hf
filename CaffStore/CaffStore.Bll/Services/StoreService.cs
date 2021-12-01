@@ -26,9 +26,9 @@ namespace CaffStore.Bll.Services
             this.context = context;
         }
 
-        public async Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages()
+        public async Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages(string filter)
         {
-            return await context.CaffFiles.Select(caff => new UploadedImagesResponseDto
+            var files = await context.CaffFiles.Select(caff => new UploadedImagesResponseDto
             {
                 FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
                 CaffRoute = caff.CaffRoute,
@@ -39,6 +39,15 @@ namespace CaffStore.Bll.Services
                     Tags = ciff.Tags.Select(tag => tag.Text)
                 }).ToList()
             }).ToListAsync();
+
+            if (filter != null)
+            {
+                files = files
+                    .Where(f => f.FileName.Contains(filter))
+                    .ToList();
+            }
+
+            return files;
         }
 
         public async Task Upload(IFormFile file)
@@ -133,7 +142,7 @@ namespace CaffStore.Bll.Services
             }
         }
 
-        private string DecodeBase64(string encodedString)
+        private static string DecodeBase64(string encodedString)
         {
             byte[] data = Convert.FromBase64String(encodedString);
             return Encoding.UTF8.GetString(data);

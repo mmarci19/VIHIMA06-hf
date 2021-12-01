@@ -9,9 +9,17 @@ import { StoreService } from '../../services/store.service';
 })
 export class BrowseComponent implements OnInit {
   images: UploadedImagesResponseDto[] = [];
+  searchText?: string;
+
   constructor(private service: StoreService) {}
 
   ngOnInit(): void {
-    this.service.getUploadedImages().subscribe((resp) => (this.images = resp));
+    this.loadImages();
+  }
+
+  loadImages(): void {
+    this.service
+      .getUploadedImages(this.searchText)
+      .subscribe((resp) => (this.images = resp));
   }
 }

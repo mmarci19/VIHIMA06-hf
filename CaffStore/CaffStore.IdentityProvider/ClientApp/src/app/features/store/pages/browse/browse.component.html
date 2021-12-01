@@ -1,3 +1,25 @@
+<form class="form-inline md-form mr-auto mb-4">
+  <input
+    class="form-control mr-sm-2"
+    [(ngModel)]="searchText"
+    type="text"
+    placeholder="Keresés"
+    aria-label="Keresés"
+    name="search"
+  />
+  <button
+    mat-raised-button
+    size="sm"
+    color="elegant"
+    rounded="true"
+    class="my-0 waves-light"
+    mdbWavesEffect
+    type="submit"
+    (click)="loadImages()"
+  >
+    Keresés
+  </button>
+</form>
 <div class="row">
   <div class="col-md-3" *ngFor="let image of images">
     <app-image *ngIf="image.gifRoute" [image]="image"></app-image>
