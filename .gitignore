@@ -2,5 +2,10 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/VIHIMA06-hf/v16
-/CaffStore/CaffStore.Api/Resources/Images/2.caff
+.vs/
+/CaffStore/CaffStore.Api/Resources/
+/Parser
+bin/
+obj/
+/CaffStore/CaffStore.Api/outgif.gif
+/CaffStore/CaffStore.Api/out.json

@@ -121,6 +121,165 @@ export class StoreClient {
         }
         return _observableOf<FileResponse>(<any>null);
     }
+
+    browseImages(): Observable<UploadedImagesResponseDto[]> {
+        let url_ = this.baseUrl + "/api/Store/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processBrowseImages(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processBrowseImages(<any>response_);
+                } catch (e) {
+                    return <Observable<UploadedImagesResponseDto[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UploadedImagesResponseDto[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processBrowseImages(response: HttpResponseBase): Observable<UploadedImagesResponseDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(UploadedImagesResponseDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UploadedImagesResponseDto[]>(<any>null);
+    }
+}
+
+export class UploadedImagesResponseDto implements IUploadedImagesResponseDto {
+    fileName?: string | undefined;
+    gifRoute?: string | undefined;
+    caffRoute?: string | undefined;
+    ciffs?: CiffDto[] | undefined;
+
+    constructor(data?: IUploadedImagesResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fileName = _data["fileName"];
+            this.gifRoute = _data["gifRoute"];
+            this.caffRoute = _data["caffRoute"];
+            if (Array.isArray(_data["ciffs"])) {
+                this.ciffs = [] as any;
+                for (let item of _data["ciffs"])
+                    this.ciffs!.push(CiffDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): UploadedImagesResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadedImagesResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fileName"] = this.fileName;
+        data["gifRoute"] = this.gifRoute;
+        data["caffRoute"] = this.caffRoute;
+        if (Array.isArray(this.ciffs)) {
+            data["ciffs"] = [];
+            for (let item of this.ciffs)
+                data["ciffs"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IUploadedImagesResponseDto {
+    fileName?: string | undefined;
+    gifRoute?: string | undefined;
+    caffRoute?: string | undefined;
+    ciffs?: CiffDto[] | undefined;
+}
+
+export class CiffDto implements ICiffDto {
+    caption?: string | undefined;
+    tags?: string[] | undefined;
+
+    constructor(data?: ICiffDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.caption = _data["caption"];
+            if (Array.isArray(_data["tags"])) {
+                this.tags = [] as any;
+                for (let item of _data["tags"])
+                    this.tags!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CiffDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CiffDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["caption"] = this.caption;
+        if (Array.isArray(this.tags)) {
+            data["tags"] = [];
+            for (let item of this.tags)
+                data["tags"].push(item);
+        }
+        return data; 
+    }
+}
+
+export interface ICiffDto {
+    caption?: string | undefined;
+    tags?: string[] | undefined;
 }
 
 export interface FileResponse {

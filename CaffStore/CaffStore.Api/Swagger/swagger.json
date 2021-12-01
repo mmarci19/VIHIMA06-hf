@@ -59,7 +59,75 @@
           }
         }
       }
+    },
+    "/api/Store/all": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "Store_BrowseImages",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UploadedImagesResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
-  "components": {}
+  "components": {
+    "schemas": {
+      "UploadedImagesResponseDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "gifRoute": {
+            "type": "string",
+            "nullable": true
+          },
+          "caffRoute": {
+            "type": "string",
+            "nullable": true
+          },
+          "ciffs": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CiffDto"
+            }
+          }
+        }
+      },
+      "CiffDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "caption": {
+            "type": "string",
+            "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
 }

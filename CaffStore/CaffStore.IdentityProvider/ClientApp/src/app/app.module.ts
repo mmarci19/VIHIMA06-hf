@@ -13,6 +13,9 @@ import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { environment } from 'src/environments/environment';
 import { API_BASE_URL } from './shared';
+import { CommonModule } from '@angular/common';
+import { StoreModule } from './features/store/store.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [AppComponent, NavMenuComponent, HomeComponent],
@@ -20,9 +23,12 @@ import { API_BASE_URL } from './shared';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
-    ApiAuthorizationModule,
     AppRoutingModule,
+    ApiAuthorizationModule,
     RouterModule,
+    StoreModule,
+    CommonModule,
+    BrowserAnimationsModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true },

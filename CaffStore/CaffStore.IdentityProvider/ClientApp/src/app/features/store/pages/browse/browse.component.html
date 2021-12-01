@@ -1,1 +1,6 @@
-<p>browse works!</p>
+<div class="d-flex flex-column" *ngFor="let image of images">
+  <div *ngIf="image.gifRoute">
+    <span>{{ image.fileName }}</span>
+    <app-image [source]="image.gifRoute"></app-image>
+  </div>
+</div>

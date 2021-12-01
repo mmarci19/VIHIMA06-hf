@@ -25,7 +25,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="StaticFiles\" />
+	  <None Update="parser.exe">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 	<Target Name="NSwag" AfterTargets="Build">

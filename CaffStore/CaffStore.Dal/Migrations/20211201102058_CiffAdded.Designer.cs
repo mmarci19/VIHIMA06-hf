@@ -4,14 +4,16 @@ using CaffStore.Dal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CaffStore.Dal.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    partial class StoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211201102058_CiffAdded")]
+    partial class CiffAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,9 +30,6 @@ namespace CaffStore.Dal.Migrations
                     b.Property<string>("CaffRoute")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Creator")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Date")
                         .HasColumnType("nvarchar(max)");
 
@@ -39,7 +38,7 @@ namespace CaffStore.Dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CaffFiles");
+                    b.ToTable("UploadedFiles");
                 });
 
             modelBuilder.Entity("CaffStore.Dal.Models.CiffFile", b =>
@@ -51,7 +50,10 @@ namespace CaffStore.Dal.Migrations
                     b.Property<Guid>("CaffFileId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Caption")
+                    b.Property<string>("Capture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Creator")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

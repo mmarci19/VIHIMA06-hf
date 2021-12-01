@@ -1,6 +1,8 @@
-﻿using CaffStore.Bll.Interfaces;
+﻿using CaffStore.Bll.Dtos;
+using CaffStore.Bll.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +41,12 @@ namespace CaffStore.Api.Controllers
         public async Task<ActionResult> Download(Guid id)
         {
             return Ok();
+        }
+
+        [HttpGet("all")]
+        public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages()
+        {
+            return await service.GetUploadedImages();
         }
     }
 }
