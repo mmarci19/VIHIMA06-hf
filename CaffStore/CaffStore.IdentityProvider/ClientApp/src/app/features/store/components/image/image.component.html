@@ -1,1 +1,16 @@
-<img [src]="getGIfURL(source)" />
+<mat-card class="card">
+  <mat-card-title>{{ image.fileName }}</mat-card-title>
+  <mat-card-content>
+    <img *ngIf="image.gifRoute" [src]="getResourceURL(image.gifRoute)" />
+  </mat-card-content>
+  <mat-divider inset></mat-divider>
+  <mat-card-actions>
+    <button mat-raised-button>Megtekintés</button>
+    <button
+      mat-raised-button
+      (click)="download(image.caffRoute, image.fileName)"
+    >
+      Letöltés
+    </button>
+  </mat-card-actions>
+</mat-card>

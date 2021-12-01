@@ -44,7 +44,7 @@ namespace CaffStore.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages()
+        public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages(string filter)
         {
             return await service.GetUploadedImages();
         }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UploadedImagesResponseDto } from 'src/app/shared';
 import { StoreService } from '../../services/store.service';
-import { ImageComponent } from '../../components/image/image.component';
 
 @Component({
   selector: 'app-browse',

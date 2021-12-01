@@ -107,7 +107,8 @@ namespace CaffStore.Api
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources/Images")),
-                RequestPath = new PathString("/Resources/Images")
+                RequestPath = new PathString("/Resources/Images"),
+                ServeUnknownFileTypes = true
             });
 
             app.UseRouting();
