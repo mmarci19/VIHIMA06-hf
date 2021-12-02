@@ -111,6 +111,7 @@ namespace CaffStore.Api
                 ServeUnknownFileTypes = true
             });
 
+            app.UseAuthentication();
             app.UseRouting();
             app.UseCors();
 

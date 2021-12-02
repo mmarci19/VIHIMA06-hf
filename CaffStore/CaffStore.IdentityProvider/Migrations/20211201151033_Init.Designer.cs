@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CaffStore.IdentityProvider.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211130204557_Init")]
+    [Migration("20211201151033_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

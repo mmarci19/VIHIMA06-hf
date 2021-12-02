@@ -1,6 +1,9 @@
 using CaffStore.IdentityProvider.Data;
 using CaffStore.IdentityProvider.Models;
+using CaffStore.IdentityProvider.Services;
+using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityServer()
@@ -20,12 +24,28 @@ builder.Services.AddIdentityServer()
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
+builder.Services.AddAuthorization(o =>
+{
+    o.AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
+{
+    builder
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+    .WithOrigins("https://localhost:44464");
+}));
+
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
 
 UpdateDatabase(app);
+CreateRoles(app.Services.CreateScope().ServiceProvider);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,6 +60,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors();
 app.UseRouting();
 
 app.UseAuthentication();
@@ -51,7 +72,7 @@ app.MapControllerRoute(
     pattern: "{controller}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-app.MapFallbackToFile("index.html");;
+app.MapFallbackToFile("index.html"); ;
 
 app.Run();
 
@@ -65,6 +86,33 @@ static void UpdateDatabase(IApplicationBuilder app)
         using (var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>())
         {
             context.Database.Migrate();
+        }
+    }
+}
+
+async Task CreateRoles(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    IdentityResult roleResult;
+
+    var roleExist = await roleManager.RoleExistsAsync("Admin");
+    if (!roleExist)
+    {
+        roleResult = await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
+
+    var getUser = await userManager.FindByEmailAsync("admin@admin.hu");
+
+    if (getUser == null)
+    {
+        var user = new ApplicationUser("admin@admin.hu");
+        string adminPassword = "Asdf1234.";
+
+        var createUser = await userManager.CreateAsync(user, adminPassword);
+        if (createUser.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
         }
     }
 }
