@@ -60,11 +60,15 @@ namespace CaffStore.Api
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = false,
 
-                    ValidIssuer = "https://localhost:5101",
+                    ValidIssuer = "https://localhost:44464",
                     ValidAudience = "CaffStore.IdentityProviderAPI"
                 };
             });
 
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
+            });
 
             services.Configure<FormOptions>(o =>
             {
@@ -82,8 +86,10 @@ namespace CaffStore.Api
                     .WithOrigins("https://localhost:44464")
                     .AllowCredentials();
             }));
+            services.AddHttpContextAccessor();
 
             services.AddTransient<IStoreService, StoreService>();
+            services.AddTransient<IUserService, UserService>();
             //services.AddSwaggerGen(c =>
             //{
             //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CaffStore.Api", Version = "v1" });
@@ -111,10 +117,10 @@ namespace CaffStore.Api
                 ServeUnknownFileTypes = true
             });
 
-            app.UseAuthentication();
             app.UseRouting();
             app.UseCors();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

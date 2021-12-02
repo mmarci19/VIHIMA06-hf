@@ -20,14 +20,17 @@ namespace CaffStore.Bll.Services
     public class StoreService : IStoreService
     {
         private readonly StoreDbContext context;
+        private readonly IUserService userService;
 
-        public StoreService(StoreDbContext context)
+        public StoreService(StoreDbContext context, IUserService userService)
         {
             this.context = context;
+            this.userService = userService;
         }
 
         public async Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages(string filter)
         {
+            var id = userService.GetCurrentUserId();
             var files = await context.CaffFiles.Select(caff => new UploadedImagesResponseDto
             {
                 FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
