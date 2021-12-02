@@ -147,6 +147,74 @@
           }
         }
       }
+    },
+    "/api/Store/image": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "Store_GetImageById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Store/comment/{imageId}": {
+      "post": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "Store_AddComment",
+        "parameters": [
+          {
+            "name": "imageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "components": {
@@ -169,6 +237,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
           "fileName": {
             "type": "string",
             "nullable": true
@@ -180,12 +252,45 @@
           "caffRoute": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "DetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "date": {
+            "type": "string",
+            "nullable": true
+          },
+          "creator": {
+            "type": "string",
+            "nullable": true
+          },
+          "fileName": {
+            "type": "string",
+            "nullable": true
+          },
+          "gifRoute": {
+            "type": "string",
+            "nullable": true
           },
           "ciffs": {
             "type": "array",
             "nullable": true,
             "items": {
               "$ref": "#/components/schemas/CiffDto"
+            }
+          },
+          "comments": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CommentDto"
             }
           }
         }
@@ -204,6 +309,24 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "CommentDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
           }
         }
       }

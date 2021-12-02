@@ -9,6 +9,7 @@ namespace CaffStore.Bll.Interfaces
     public interface IUserService
     {
         string GetCurrentUserId();
+        string GetCurrentUserName();
         string GetCurrentUserRole();
     }
 }

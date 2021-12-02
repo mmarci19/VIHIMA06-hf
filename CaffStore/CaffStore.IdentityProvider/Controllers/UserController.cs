@@ -36,6 +36,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task SetUsername(string userId, string username)
     {
-
+        var user = await userManager.FindByIdAsync(userId);
+        await userManager.SetUserNameAsync(user, username);
     }
 }

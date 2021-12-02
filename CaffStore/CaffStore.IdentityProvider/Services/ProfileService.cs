@@ -33,6 +33,7 @@ namespace CaffStore.IdentityProvider.Services
 
             // Add custom claims in token here based on user properties or any other source
             claims.Add(new Claim(JwtClaimTypes.Role, role));
+            claims.Add(new Claim("username", user.UserName));
 
             context.IssuedClaims = claims;
         }

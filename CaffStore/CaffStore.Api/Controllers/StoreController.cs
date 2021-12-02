@@ -48,5 +48,17 @@ namespace CaffStore.Api.Controllers
         {
             return await service.GetUploadedImages(filter);
         }
+
+        [HttpGet("image")]
+        public async Task<DetailsDto> GetImageById(Guid id)
+        {
+            return await service.GetUploadedImageById(id);
+        }
+
+        [HttpPost("comment/{imageId}")]
+        public async Task AddComment(Guid imageId, [FromBody] CommentDto dto)
+        {
+            await service.CreateComment(imageId, dto);
+        }
     }
 }

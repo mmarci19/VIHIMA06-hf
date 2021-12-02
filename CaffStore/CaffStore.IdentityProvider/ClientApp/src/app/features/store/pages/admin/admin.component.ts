@@ -9,6 +9,10 @@ import { UserService } from '../../services/user.service';
 })
 export class AdminComponent implements OnInit {
   users: UserDto[] = [];
+  displayedColumns: string[] = ['id', 'username', 'save'];
+
+  currentlyEditedIndex = -1;
+
   constructor(private service: UserService) {}
 
   ngOnInit(): void {
@@ -17,5 +21,17 @@ export class AdminComponent implements OnInit {
 
   loadUsers() {
     this.service.getUsers().subscribe((resp) => (this.users = resp));
+  }
+
+  setCurrentlyEditedIndex(index: number): void {
+    this.currentlyEditedIndex = index;
+  }
+
+  saveEdit(id: string, userName: string) {
+    console.log(id, userName);
+    this.service.setUsername(id, userName).subscribe(() => {
+      this.loadUsers();
+      this.currentlyEditedIndex = -1;
+    });
   }
 }

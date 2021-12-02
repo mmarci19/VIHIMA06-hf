@@ -11,6 +11,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule } from '@angular/forms';
 import { AdminComponent } from './pages/admin/admin.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { DetailsComponent } from './pages/details/details.component';
+import { CommentComponent } from './components/comment/comment.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +25,8 @@ import { AdminComponent } from './pages/admin/admin.component';
     BrowseComponent,
     ImageComponent,
     AdminComponent,
+    DetailsComponent,
+    CommentComponent,
   ],
   imports: [
     StoreRoutingModule,
@@ -29,6 +36,9 @@ import { AdminComponent } from './pages/admin/admin.component';
     MatButtonModule,
     MatDividerModule,
     FormsModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   exports: [ImageComponent],
 })

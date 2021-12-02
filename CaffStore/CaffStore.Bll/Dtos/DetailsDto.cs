@@ -3,11 +3,14 @@ using System.Collections.Generic;
 
 namespace CaffStore.Bll.Dtos
 {
-    public class UploadedImagesResponseDto
+    public class DetailsDto
     {
         public Guid Id { get; set; }
+        public string Date { get; set; }
+        public string Creator { get; set; }
         public string FileName { get; set; }
         public string GifRoute { get; set; }
-        public string CaffRoute { get; set; }
+        public List<CiffDto> Ciffs { get; set; }
+        public List<CommentDto> Comments { get; set; }
     }
 }

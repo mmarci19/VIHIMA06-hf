@@ -6,6 +6,7 @@ namespace CaffStore.Dal
     public class StoreDbContext : DbContext
     {
         public DbSet<CaffFile> CaffFiles { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public StoreDbContext(DbContextOptions options) : base(options)
         {

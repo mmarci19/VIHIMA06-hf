@@ -1,0 +1,36 @@
+<div>
+  <span>Filename: {{ image.fileName }}</span>
+</div>
+<img *ngIf="image.gifRoute" [src]="getResourceURL(image.gifRoute)" />
+<div>
+  <span>Creator: {{ image.creator }}</span>
+  <span>Date: {{ image.date }}</span>
+  <br />
+
+  <div *ngFor="let ciff of image.ciffs; let i = index">
+    <span>{{ i + 1 }}. ciff</span><br />
+    <span>Caption: {{ ciff.caption }}</span>
+    <br />
+    <span>Tags:</span><br />
+    <span *ngFor="let tag of ciff.tags">{{ tag }} </span>
+  </div>
+</div>
+
+<mat-card-content>
+  <mat-form-field appearance="legacy" class="wide-form-field">
+    <mat-label>Új komment</mat-label>
+    <input matInput type="text" [(ngModel)]="newCommentText" />
+  </mat-form-field>
+  <button
+    mat-button
+    color="primary"
+    (click)="sendNewComment()"
+    class="float-right"
+  >
+    Küldés
+  </button>
+  <app-comment
+    *ngFor="let comment of image.comments"
+    [comment]="comment"
+  ></app-comment>
+</mat-card-content>

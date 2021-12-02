@@ -5,7 +5,9 @@
   </mat-card-content>
   <mat-divider inset></mat-divider>
   <mat-card-actions>
-    <button mat-raised-button>Megtekintés</button>
+    <button mat-raised-button routerLink="./details/{{ image.id }}">
+      Megtekintés
+    </button>
     <button
       mat-raised-button
       (click)="download(image.caffRoute, image.fileName)"

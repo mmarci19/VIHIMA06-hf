@@ -30,17 +30,12 @@ namespace CaffStore.Bll.Services
 
         public async Task<IEnumerable<UploadedImagesResponseDto>> GetUploadedImages(string filter)
         {
-            var id = userService.GetCurrentUserId();
             var files = await context.CaffFiles.Select(caff => new UploadedImagesResponseDto
             {
+                Id = caff.Id,
                 FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
                 CaffRoute = caff.CaffRoute,
                 GifRoute = caff.GifRoute,
-                Ciffs = caff.CiffFiles.Select(ciff => new CiffDto
-                {
-                    Caption = ciff.Caption,
-                    Tags = ciff.Tags.Select(tag => tag.Text)
-                }).ToList()
             }).ToListAsync();
 
             if (filter != null)
@@ -51,6 +46,34 @@ namespace CaffStore.Bll.Services
             }
 
             return files;
+        }
+
+        public async Task<DetailsDto> GetUploadedImageById(Guid id)
+        {
+            var file = await context.CaffFiles
+                .Where(caff => caff.Id == id)
+                .Include(caff => caff.Comments)
+                .Select(caff => new DetailsDto
+                {
+                    Id = caff.Id,
+                    Creator = caff.Creator,
+                    Date = caff.Date,
+                    FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
+                    GifRoute = caff.GifRoute,
+                    Ciffs = caff.CiffFiles.Select(ciff => new CiffDto
+                    {
+                        Caption = ciff.Caption,
+                        Tags = ciff.Tags.Select(tag => tag.Text)
+                    }).ToList(),
+                    Comments = caff.Comments.Select(comment => new CommentDto
+                    {
+                        Username = comment.Author,
+                        Content = comment.Content,
+                        CreatedAt = comment.CommentDate
+                    }).ToList()
+                }).SingleOrDefaultAsync();
+
+            return file;
         }
 
         public async Task Upload(IFormFile file)
@@ -149,6 +172,26 @@ namespace CaffStore.Bll.Services
         {
             byte[] data = Convert.FromBase64String(encodedString);
             return Encoding.UTF8.GetString(data);
+        }
+
+        public async Task CreateComment(Guid imageId, CommentDto dto)
+        {
+            var userName = userService.GetCurrentUserName();
+            var image = await context.CaffFiles
+                .Where(caff => caff.Id == imageId)
+                .Include(caff => caff.Comments)
+                .SingleOrDefaultAsync();
+
+            var comment = new Comment
+            {
+                CommentDate = DateTime.Now,
+                Author = userName,
+                Content = dto.Content
+            };
+            image.Comments.Add(comment);
+
+            context.Comments.Add(comment);
+            await context.SaveChangesAsync();
         }
     }
 }

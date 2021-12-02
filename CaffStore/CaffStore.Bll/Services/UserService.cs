@@ -18,6 +18,11 @@ namespace CaffStore.Bll.Services
             return httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
+        public string GetCurrentUserName()
+        {
+            return httpContext.HttpContext.User.FindFirstValue("username");
+        }
+
         public string GetCurrentUserRole()
         {
             return httpContext.HttpContext.User.FindFirstValue(ClaimsIdentity.DefaultRoleClaimType);
