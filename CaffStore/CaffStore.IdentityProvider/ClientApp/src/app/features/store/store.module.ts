@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DetailsComponent } from './pages/details/details.component';
 import { CommentComponent } from './components/comment/comment.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { CommentComponent } from './components/comment/comment.component';
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
+    MatProgressSpinnerModule,
   ],
   exports: [ImageComponent],
 })

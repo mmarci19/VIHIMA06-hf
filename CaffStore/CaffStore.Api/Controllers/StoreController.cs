@@ -37,11 +37,11 @@ namespace CaffStore.Api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> Download(Guid id)
-        {
-            return Ok();
-        }
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult> Download(Guid id)
+        //{
+        //    return Ok();
+        //}
 
         [HttpGet("all")]
         public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages(string filter)

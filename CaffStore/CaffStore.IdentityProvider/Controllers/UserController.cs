@@ -26,10 +26,10 @@ public class UserController : ControllerBase
     public async Task<IEnumerable<UserDto>> Get()
     {
         var users = await context.Users.ToListAsync();
-        return users.Select(x => new UserDto
+        return users.Select(user => new UserDto
         {
-            Id = x.Id,
-            UserName = x.UserName
+            Id = user.Id,
+            UserName = user.UserName
         });
     }
 

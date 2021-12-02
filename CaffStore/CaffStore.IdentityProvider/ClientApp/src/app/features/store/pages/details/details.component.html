@@ -1,36 +1,47 @@
-<div>
-  <span>Filename: {{ image.fileName }}</span>
+<div *ngIf="!this.image.gifRoute" class="d-flex justify-content-center">
+  <mat-spinner></mat-spinner>
 </div>
-<img *ngIf="image.gifRoute" [src]="getResourceURL(image.gifRoute)" />
-<div>
-  <span>Creator: {{ image.creator }}</span>
-  <span>Date: {{ image.date }}</span>
-  <br />
-
-  <div *ngFor="let ciff of image.ciffs; let i = index">
-    <span>{{ i + 1 }}. ciff</span><br />
-    <span>Caption: {{ ciff.caption }}</span>
-    <br />
-    <span>Tags:</span><br />
-    <span *ngFor="let tag of ciff.tags">{{ tag }} </span>
+<div
+  *ngIf="this.image.gifRoute"
+  class="d-flex justify-content-center flex-column"
+>
+  <div class="text-center">
+    <span>Filename: {{ image.fileName }}</span>
   </div>
-</div>
+  <img *ngIf="image.gifRoute" [src]="getResourceURL(image.gifRoute)" />
+  <div>
+    <span>Creator: {{ image.creator }}</span>
+    <span>Date: {{ image.date }}</span>
+    <br />
 
-<mat-card-content>
-  <mat-form-field appearance="legacy" class="wide-form-field">
-    <mat-label>Új komment</mat-label>
-    <input matInput type="text" [(ngModel)]="newCommentText" />
-  </mat-form-field>
-  <button
-    mat-button
-    color="primary"
-    (click)="sendNewComment()"
-    class="float-right"
-  >
-    Küldés
-  </button>
+    <div class="my-3" *ngFor="let ciff of image.ciffs; let i = index">
+      <span>{{ i + 1 }}. ciff</span><br />
+      <span>Caption: {{ ciff.caption }}</span>
+      <br />
+      <span>Tags:</span><br />
+      <span *ngFor="let tag of ciff.tags">{{ tag }} </span>
+    </div>
+  </div>
+
+  <div *ngIf="isAuthorized" class="d-flex w-100 justify-content-between my-3">
+    <mat-card-content>
+      <mat-form-field appearance="legacy" class="wide-form-field">
+        <mat-label>Új komment</mat-label>
+        <textarea matInput [(ngModel)]="newCommentText"></textarea>
+      </mat-form-field>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="sendNewComment()"
+        class="float-right m-2"
+      >
+        Küldés
+      </button>
+    </mat-card-content>
+  </div>
+  <h2>Kommentek</h2>
   <app-comment
     *ngFor="let comment of image.comments"
     [comment]="comment"
   ></app-comment>
-</mat-card-content>
+</div>

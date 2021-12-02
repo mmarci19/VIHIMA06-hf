@@ -18,6 +18,7 @@ export class BrowseComponent implements OnInit {
   }
 
   loadImages(): void {
+    this.images = [];
     this.service
       .getUploadedImages(this.searchText)
       .subscribe((resp) => (this.images = resp));
