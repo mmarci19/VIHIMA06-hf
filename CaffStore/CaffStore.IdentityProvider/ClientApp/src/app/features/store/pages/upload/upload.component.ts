@@ -29,8 +29,14 @@ export class UploadComponent {
         if (event.type === HttpEventType.UploadProgress)
           this.progress = Math.round((100 * event.loaded) / (event.total ?? 1));
         else if (event.type === HttpEventType.Response) {
-          this.message = 'Upload success.';
-          this.onUploadFinished.emit(event.body);
+          if (event.ok) {
+            this.message = 'Sikeres feltöltés';
+            this.onUploadFinished.emit(event.body);
+          } else {
+            this.message = 'A fájl feltöltése során hiba történt.';
+          }
+          this.progress = 0;
+          this.message = '';
         }
       });
   };

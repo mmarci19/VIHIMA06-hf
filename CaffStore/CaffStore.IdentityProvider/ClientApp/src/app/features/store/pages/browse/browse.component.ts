@@ -10,6 +10,7 @@ import { StoreService } from '../../services/store.service';
 export class BrowseComponent implements OnInit {
   images: UploadedImagesResponseDto[] = [];
   searchText?: string;
+  isLoading = true;
 
   constructor(private service: StoreService) {}
 
@@ -18,9 +19,10 @@ export class BrowseComponent implements OnInit {
   }
 
   loadImages(): void {
-    this.images = [];
-    this.service
-      .getUploadedImages(this.searchText)
-      .subscribe((resp) => (this.images = resp));
+    this.isLoading = true;
+    this.service.getUploadedImages(this.searchText).subscribe((resp) => {
+      this.images = resp;
+      this.isLoading = false;
+    });
   }
 }

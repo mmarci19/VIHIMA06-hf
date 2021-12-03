@@ -1,7 +1,11 @@
 <mat-card class="d-flex card">
   <mat-card-title>{{ image.fileName }}</mat-card-title>
   <mat-card-content>
-    <img *ngIf="image.gifRoute" [src]="getResourceURL(image.gifRoute)" />
+    <img
+      class="w-100"
+      *ngIf="image.gifRoute"
+      [src]="getResourceURL(image.gifRoute)"
+    />
   </mat-card-content>
   <mat-divider inset></mat-divider>
   <mat-card-actions>

@@ -1,33 +1,37 @@
-<div *ngIf="images.length === 0" class="d-flex justify-content-center">
+<div *ngIf="isLoading" class="d-flex justify-content-center">
   <mat-spinner></mat-spinner>
 </div>
-<div *ngIf="images.length > 0">
-  <app-upload></app-upload>
+<div *ngIf="!isLoading">
+  <app-upload (onUploadFinished)="loadImages()"></app-upload>
   <form class="form-inline md-form mr-auto mb-4">
-    <input
-      class="form-control mr-sm-2 col-md-10"
-      [(ngModel)]="searchText"
-      type="text"
-      placeholder="Keresés"
-      aria-label="Keresés"
-      name="search"
-    />
-    <button
-      mat-raised-button
-      size="sm"
-      color="elegant"
-      rounded="true"
-      class="my-0 waves-light"
-      mdbWavesEffect
-      type="submit"
-      (click)="loadImages()"
-      class="my-2 col-md2"
-    >
-      Keresés
-    </button>
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="col-md-9">
+        <input
+          class="form-control mr-sm-2"
+          [(ngModel)]="searchText"
+          type="text"
+          placeholder="Keresés"
+          aria-label="Keresés"
+          name="search"
+        />
+      </div>
+      <button
+        mat-raised-button
+        size="sm"
+        color="elegant"
+        rounded="true"
+        class="my-0 waves-light"
+        mdbWavesEffect
+        type="submit"
+        (click)="loadImages()"
+        class="m-2 col-md-3"
+      >
+        Keresés
+      </button>
+    </div>
   </form>
   <div class="row">
-    <div class="col-md-3" *ngFor="let image of images">
+    <div class="col-sm-6 col-lg-3" *ngFor="let image of images">
       <app-image *ngIf="image.gifRoute" [image]="image"></app-image>
     </div>
   </div>

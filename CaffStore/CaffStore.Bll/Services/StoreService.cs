@@ -33,7 +33,7 @@ namespace CaffStore.Bll.Services
             var files = await context.CaffFiles.Select(caff => new UploadedImagesResponseDto
             {
                 Id = caff.Id,
-                FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
+                FileName = caff.OriginalFileName,
                 CaffRoute = caff.CaffRoute,
                 GifRoute = caff.GifRoute,
             }).ToListAsync();
@@ -67,19 +67,19 @@ namespace CaffStore.Bll.Services
                 Id = caff.Id,
                 Creator = caff.Creator,
                 Date = caff.Date,
-                FileName = caff.CaffRoute.Split('\\', StringSplitOptions.RemoveEmptyEntries).Last(),
+                FileName = caff.OriginalFileName,
                 GifRoute = caff.GifRoute,
                 Ciffs = caff.CiffFiles.Select(ciff => new CiffDto
                 {
                     Caption = ciff.Caption,
                     Tags = ciff.Tags.Select(tag => tag.Text)
                 }).ToList(),
-                Comments = caff.Comments.Select(comment => new CommentDto
+                Comments = caff.Comments?.Select(comment => new CommentDto
                 {
                     Username = comment.Author,
                     Content = comment.Content,
                     CreatedAt = comment.CommentDate
-                }).ToList()
+                }).ToList() ?? new List<CommentDto>()
             };
         }
 
@@ -110,12 +110,20 @@ namespace CaffStore.Bll.Services
             {
                 var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
 
-                var fullPath = Path.Combine(pathToSave, fileName);
+                var fileSystemName = Guid.NewGuid();
+                var fullPath = Path.Combine(pathToSave, fileSystemName.ToString() + ".caff");
                 var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(Path.Combine(fullPath, fileName));
 
                 // elmentjük a caff-ot és a gif-et is
-                var caffPath = Path.Combine(folderName, fileNameWithoutExtension + ".caff");
-                var gifPath = Path.Combine(folderName, fileNameWithoutExtension + ".gif");
+                var caffPath = Path.Combine(folderName, fileSystemName + ".caff");
+                var gifPath = Path.Combine(folderName, fileSystemName + ".gif");
+
+                var uploadedFile = new CaffFile
+                {
+                    CaffRoute = caffPath,
+                    GifRoute = gifPath,
+                    OriginalFileName = fileNameWithoutExtension
+                };
 
                 // nem használt erőforrások felszabadítása a végén
                 using (var stream = new FileStream(fullPath, FileMode.Create))
@@ -140,45 +148,41 @@ namespace CaffStore.Bll.Services
                     // kiolvassuk a konvertálás eredményét
                     string output = process.StandardOutput.ReadToEnd();
 
-                    await SaveCaffIfSuccesful(output, gifPath, caffPath);
+                    await SaveCaffIfSuccesful(output, uploadedFile);
                 }
             }
         }
 
-        private async Task SaveCaffIfSuccesful(string output, string gifPath, string caffPath)
+        private async Task SaveCaffIfSuccesful(string output, CaffFile file)
         {
             if (output == "CONVERSION SUCCESFUL")
             {
-                File.Copy("outgif.gif", gifPath, true);
-
-                Console.WriteLine("Conversion successful");
+                File.Copy("outgif.gif", file.GifRoute, true);
 
                 // metaadatokat beolvassuk a json-ből
                 var caffJson = LoadCaffJson();
 
-                var uploadedFile = new CaffFile
-                {
-                    CaffRoute = caffPath,
-                    GifRoute = gifPath,
-                    Creator = DecodeBase64(caffJson.CreatorB64),
+                file.Creator = DecodeBase64(caffJson.CreatorB64);
 
-                    // átalakítjuk a json-t adatbázisbeli entitásokká
-                    CiffFiles = caffJson.Ciffs.Select(ciff => new CiffFile
-                    {
-                        Caption = DecodeBase64(ciff.CaptionB64),
-                        Tags = ciff.TagB64s
-                            .Select(tag => new Tag(DecodeBase64(tag)))
-                            .ToList()
-                    }).ToList(),
-                    Date = $"{caffJson.Year}. {caffJson.Month}. {caffJson.Day}. {caffJson.Hour} {caffJson.Minute}"
-                };
+                // átalakítjuk a json-t adatbázisbeli entitásokká
+                file.CiffFiles = caffJson.Ciffs.Select(ciff => new CiffFile
+                {
+                    Caption = DecodeBase64(ciff.CaptionB64),
+                    Tags = ciff.TagB64s
+                        .Select(tag => new Tag(DecodeBase64(tag)))
+                        .ToList()
+                }).ToList();
+                file.Date = $"{caffJson.Year}. {caffJson.Month}. {caffJson.Day}. {caffJson.Hour} {caffJson.Minute}";
 
                 // mentés db-be
-                context.CaffFiles.Add(uploadedFile);
+                context.CaffFiles.Add(file);
                 await context.SaveChangesAsync();
             }
 
-            Console.WriteLine("Error in the native parser");
+            else
+            {
+                throw new ApplicationException("A kép feldolgozása nem sikerült.");
+            }
         }
 
         private static CaffJson LoadCaffJson()
