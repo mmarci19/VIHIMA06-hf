@@ -73,57 +73,10 @@ export class StoreClient {
         return _observableOf<FileResponse>(<any>null);
     }
 
-    download(id: string): Observable<FileResponse> {
-        let url_ = this.baseUrl + "/api/Store/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/octet-stream"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDownload(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDownload(<any>response_);
-                } catch (e) {
-                    return <Observable<FileResponse>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<FileResponse>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processDownload(response: HttpResponseBase): Observable<FileResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<FileResponse>(<any>null);
-    }
-
-    browseImages(): Observable<UploadedImagesResponseDto[]> {
-        let url_ = this.baseUrl + "/api/Store/all";
+    browseImages(filter: string | null | undefined): Observable<UploadedImagesResponseDto[]> {
+        let url_ = this.baseUrl + "/api/Store/all?";
+        if (filter !== undefined && filter !== null)
+            url_ += "filter=" + encodeURIComponent("" + filter) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -176,13 +129,164 @@ export class StoreClient {
         }
         return _observableOf<UploadedImagesResponseDto[]>(<any>null);
     }
+
+    getImageById(id: string | undefined): Observable<DetailsDto> {
+        let url_ = this.baseUrl + "/api/Store/image?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetImageById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetImageById(<any>response_);
+                } catch (e) {
+                    return <Observable<DetailsDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DetailsDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetImageById(response: HttpResponseBase): Observable<DetailsDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DetailsDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<DetailsDto>(<any>null);
+    }
+
+    addComment(imageId: string, dto: CommentDto): Observable<void> {
+        let url_ = this.baseUrl + "/api/Store/comment/{imageId}";
+        if (imageId === undefined || imageId === null)
+            throw new Error("The parameter 'imageId' must be defined.");
+        url_ = url_.replace("{imageId}", encodeURIComponent("" + imageId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddComment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddComment(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processAddComment(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    deleteImage(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Store/image/delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteImage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteImage(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDeleteImage(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
 }
 
 export class UploadedImagesResponseDto implements IUploadedImagesResponseDto {
+    id?: string;
     fileName?: string | undefined;
     gifRoute?: string | undefined;
     caffRoute?: string | undefined;
-    ciffs?: CiffDto[] | undefined;
 
     constructor(data?: IUploadedImagesResponseDto) {
         if (data) {
@@ -195,14 +299,10 @@ export class UploadedImagesResponseDto implements IUploadedImagesResponseDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.fileName = _data["fileName"];
             this.gifRoute = _data["gifRoute"];
             this.caffRoute = _data["caffRoute"];
-            if (Array.isArray(_data["ciffs"])) {
-                this.ciffs = [] as any;
-                for (let item of _data["ciffs"])
-                    this.ciffs!.push(CiffDto.fromJS(item));
-            }
         }
     }
 
@@ -215,23 +315,95 @@ export class UploadedImagesResponseDto implements IUploadedImagesResponseDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["fileName"] = this.fileName;
         data["gifRoute"] = this.gifRoute;
         data["caffRoute"] = this.caffRoute;
-        if (Array.isArray(this.ciffs)) {
-            data["ciffs"] = [];
-            for (let item of this.ciffs)
-                data["ciffs"].push(item.toJSON());
-        }
         return data; 
     }
 }
 
 export interface IUploadedImagesResponseDto {
+    id?: string;
     fileName?: string | undefined;
     gifRoute?: string | undefined;
     caffRoute?: string | undefined;
+}
+
+export class DetailsDto implements IDetailsDto {
+    id?: string;
+    date?: string | undefined;
+    creator?: string | undefined;
+    fileName?: string | undefined;
+    gifRoute?: string | undefined;
     ciffs?: CiffDto[] | undefined;
+    comments?: CommentDto[] | undefined;
+
+    constructor(data?: IDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.date = _data["date"];
+            this.creator = _data["creator"];
+            this.fileName = _data["fileName"];
+            this.gifRoute = _data["gifRoute"];
+            if (Array.isArray(_data["ciffs"])) {
+                this.ciffs = [] as any;
+                for (let item of _data["ciffs"])
+                    this.ciffs!.push(CiffDto.fromJS(item));
+            }
+            if (Array.isArray(_data["comments"])) {
+                this.comments = [] as any;
+                for (let item of _data["comments"])
+                    this.comments!.push(CommentDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["date"] = this.date;
+        data["creator"] = this.creator;
+        data["fileName"] = this.fileName;
+        data["gifRoute"] = this.gifRoute;
+        if (Array.isArray(this.ciffs)) {
+            data["ciffs"] = [];
+            for (let item of this.ciffs)
+                data["ciffs"].push(item.toJSON());
+        }
+        if (Array.isArray(this.comments)) {
+            data["comments"] = [];
+            for (let item of this.comments)
+                data["comments"].push(item.toJSON());
+        }
+        return data; 
+    }
+}
+
+export interface IDetailsDto {
+    id?: string;
+    date?: string | undefined;
+    creator?: string | undefined;
+    fileName?: string | undefined;
+    gifRoute?: string | undefined;
+    ciffs?: CiffDto[] | undefined;
+    comments?: CommentDto[] | undefined;
 }
 
 export class CiffDto implements ICiffDto {
@@ -280,6 +452,50 @@ export class CiffDto implements ICiffDto {
 export interface ICiffDto {
     caption?: string | undefined;
     tags?: string[] | undefined;
+}
+
+export class CommentDto implements ICommentDto {
+    username?: string | undefined;
+    createdAt?: Date;
+    content?: string | undefined;
+
+    constructor(data?: ICommentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.username = _data["username"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : <any>undefined;
+            this.content = _data["content"];
+        }
+    }
+
+    static fromJS(data: any): CommentDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CommentDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["username"] = this.username;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : <any>undefined;
+        data["content"] = this.content;
+        return data; 
+    }
+}
+
+export interface ICommentDto {
+    username?: string | undefined;
+    createdAt?: Date;
+    content?: string | undefined;
 }
 
 export interface FileResponse {

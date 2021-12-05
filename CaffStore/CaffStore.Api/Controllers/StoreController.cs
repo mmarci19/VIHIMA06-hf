@@ -1,5 +1,6 @@
 ﻿using CaffStore.Bll.Dtos;
 using CaffStore.Bll.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace CaffStore.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class StoreController : ControllerBase
@@ -37,16 +39,31 @@ namespace CaffStore.Api.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> Download(Guid id)
+        [AllowAnonymous]
+        [HttpGet("all")]
+        public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages(string filter)
         {
-            return Ok();
+            return await service.GetUploadedImages(filter);
         }
 
-        [HttpGet("all")]
-        public async Task<IEnumerable<UploadedImagesResponseDto>> BrowseImages()
+        [AllowAnonymous]
+        [HttpGet("image")]
+        public async Task<DetailsDto> GetImageById(Guid id)
         {
-            return await service.GetUploadedImages();
+            return await service.GetUploadedImageById(id);
+        }
+
+        [HttpPost("comment/{imageId}")]
+        public async Task AddComment(Guid imageId, [FromBody] CommentDto dto)
+        {
+            await service.CreateComment(imageId, dto);
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpGet("image/delete")]
+        public async Task DeleteImage(Guid id)
+        {
+            await service.DeleteImage(id);
         }
     }
 }

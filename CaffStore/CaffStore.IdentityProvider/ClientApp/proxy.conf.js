@@ -11,6 +11,7 @@ const PROXY_CONFIG = [
     context: [
       "/api/store",
       "/_configuration",
+      "/user",
       "/.well-known",
       "/Identity",
       "/connect",

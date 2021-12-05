@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -40,6 +41,7 @@ namespace CaffStore.Api
             services.AddDbContext<StoreDbContext>(opt =>
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                opt.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
             });
             services.AddOpenApiDocument();
 
@@ -60,11 +62,15 @@ namespace CaffStore.Api
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = false,
 
-                    ValidIssuer = "https://localhost:5101",
+                    ValidIssuer = "https://localhost:44464",
                     ValidAudience = "CaffStore.IdentityProviderAPI"
                 };
             });
 
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            });
 
             services.Configure<FormOptions>(o =>
             {
@@ -82,12 +88,10 @@ namespace CaffStore.Api
                     .WithOrigins("https://localhost:44464")
                     .AllowCredentials();
             }));
+            services.AddHttpContextAccessor();
 
             services.AddTransient<IStoreService, StoreService>();
-            //services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CaffStore.Api", Version = "v1" });
-            //});
+            services.AddTransient<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,12 +111,14 @@ namespace CaffStore.Api
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources/Images")),
-                RequestPath = new PathString("/Resources/Images")
+                RequestPath = new PathString("/Resources/Images"),
+                ServeUnknownFileTypes = true
             });
 
             app.UseRouting();
             app.UseCors();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

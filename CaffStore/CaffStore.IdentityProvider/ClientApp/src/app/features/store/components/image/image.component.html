@@ -1,1 +1,30 @@
-<img [src]="getGIfURL(source)" />
+<mat-card class="d-flex card">
+  <mat-card-title>{{ image.fileName }}</mat-card-title>
+  <mat-card-content>
+    <img
+      class="w-100"
+      *ngIf="image.gifRoute"
+      [src]="getResourceURL(image.gifRoute)"
+    />
+  </mat-card-content>
+  <mat-divider inset></mat-divider>
+  <mat-card-actions>
+    <button mat-raised-button routerLink="/details/{{ image.id }}">
+      Megtekintés
+    </button>
+    <button
+      mat-raised-button
+      (click)="download(image.caffRoute, image.fileName)"
+    >
+      Letöltés
+    </button>
+    <button
+      *ngIf="role === 'Admin'"
+      mat-raised-button
+      color="warn"
+      (click)="delete()"
+    >
+      Törlés
+    </button>
+  </mat-card-actions>
+</mat-card>

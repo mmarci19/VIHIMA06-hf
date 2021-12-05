@@ -37,6 +37,9 @@ namespace CaffStore.Dal.Migrations
                     b.Property<string>("GifRoute")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OriginalFileName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("CaffFiles");
@@ -70,7 +73,7 @@ namespace CaffStore.Dal.Migrations
                     b.Property<string>("Author")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("CaffFileId")
+                    b.Property<Guid>("CaffFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CommentDate")
@@ -83,7 +86,7 @@ namespace CaffStore.Dal.Migrations
 
                     b.HasIndex("CaffFileId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("CaffStore.Dal.Models.CiffFile", b =>
@@ -124,7 +127,9 @@ namespace CaffStore.Dal.Migrations
                 {
                     b.HasOne("CaffStore.Dal.Models.CaffFile", null)
                         .WithMany("Comments")
-                        .HasForeignKey("CaffFileId");
+                        .HasForeignKey("CaffFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CaffStore.Dal.Models.CaffFile", b =>

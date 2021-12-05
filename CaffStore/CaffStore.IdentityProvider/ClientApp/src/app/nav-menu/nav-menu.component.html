@@ -26,18 +26,19 @@
         [ngClass]="{ show: isExpanded }"
       >
         <ul class="navbar-nav flex-grow">
+          <li class="nav-item" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-dark" [routerLink]="['/browse']"
+              >Böngészés</a
+            >
+          </li>
           <li
+            *ngIf="isAdmin()"
             class="nav-item"
             [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
           >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/upload']">Upload</a>
-          </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/browse']">Browse</a>
+            <a class="nav-link text-dark" [routerLink]="['/admin']"
+              >Admin felület</a
+            >
           </li>
         </ul>
         <app-login-menu></app-login-menu>

@@ -6,7 +6,6 @@ import { UploadComponent } from './features/store/pages/upload/upload.component'
 const routes: Routes = [
   { path: '', component: BrowseComponent },
   { path: 'browse', component: BrowseComponent },
-  { path: 'upload', component: UploadComponent },
 ];
 
 @NgModule({
