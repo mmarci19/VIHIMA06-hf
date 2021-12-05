@@ -128,6 +128,30 @@
           }
         }
       }
+    },
+    "/api/Store/image/delete": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "operationId": "Store_DeleteImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
     }
   },
   "components": {

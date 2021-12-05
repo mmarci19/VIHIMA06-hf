@@ -29,10 +29,14 @@ namespace CaffStore.IdentityProvider.Services
 
             var claims = principal.Claims.ToList();
             claims = claims.Where(claim => context.RequestedClaimTypes.Contains(claim.Type)).ToList();
-            var role = (await _userManager.GetRolesAsync(user)).First();
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
             // Add custom claims in token here based on user properties or any other source
-            claims.Add(new Claim(JwtClaimTypes.Role, role));
+            if (role != null)
+            {
+                claims.Add(new Claim(JwtClaimTypes.Role, role));
+            }
+
             claims.Add(new Claim("username", user.UserName));
 
             context.IssuedClaims = claims;

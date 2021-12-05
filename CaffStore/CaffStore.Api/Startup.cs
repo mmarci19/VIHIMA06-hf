@@ -69,7 +69,7 @@ namespace CaffStore.Api
 
             services.AddAuthorization(o =>
             {
-                o.AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
+                o.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
             });
 
             services.Configure<FormOptions>(o =>

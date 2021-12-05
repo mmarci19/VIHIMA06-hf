@@ -3,8 +3,10 @@ using CaffStore.IdentityProvider.Models;
 using CaffStore.IdentityProvider.Services;
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +23,32 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
 builder.Services.AddIdentityServer()
     .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(opt =>
+    {
+        opt.Authority = "https://localhost:5101";
+        opt.Audience = "CaffStore.IdentityProviderAPI";
+
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = false,
+
+            ValidIssuer = "https://localhost:44464",
+            ValidAudience = "CaffStore.IdentityProviderAPI"
+        };
+    })
     .AddIdentityServerJwt();
 
 builder.Services.AddAuthorization(o =>
 {
-    o.AddPolicy("Admin", policy => policy.RequireClaim("role", "Admin"));
+    o.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 });
 
 builder.Services.AddControllersWithViews();

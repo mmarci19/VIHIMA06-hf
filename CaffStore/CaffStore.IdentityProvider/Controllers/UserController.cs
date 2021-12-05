@@ -1,6 +1,7 @@
 ﻿using CaffStore.IdentityProvider.Data;
 using CaffStore.IdentityProvider.Dtos;
 using CaffStore.IdentityProvider.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CaffStore.IdentityProvider.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Admin")]
 [ApiController]
 [Route("[controller]")]
 public class UserController : ControllerBase

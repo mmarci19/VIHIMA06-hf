@@ -26,4 +26,8 @@ export class StoreService {
   addComment(id: string, dto: CommentDto): Observable<void> {
     return this.client.addComment(id, dto);
   }
+
+  deleteImage(id: string): Observable<void> {
+    return this.client.deleteImage(id);
+  }
 }

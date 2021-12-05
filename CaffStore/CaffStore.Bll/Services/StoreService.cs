@@ -83,6 +83,16 @@ namespace CaffStore.Bll.Services
             };
         }
 
+        public async Task DeleteImage(Guid id)
+        {
+            var caff = await context.CaffFiles
+                .Where(caff => caff.Id == id)
+                .SingleOrDefaultAsync();
+            
+            context.CaffFiles.Remove(caff);
+            await context.SaveChangesAsync();
+        }
+
         public async Task CreateComment(Guid imageId, CommentDto dto)
         {
             var userName = userService.GetCurrentUserName();
