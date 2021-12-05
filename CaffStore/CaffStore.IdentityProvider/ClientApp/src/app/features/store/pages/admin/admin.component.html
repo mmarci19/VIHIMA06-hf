@@ -1,0 +1,39 @@
+<div *ngIf="users.length > 0" class="w-100">
+  <table mat-table [dataSource]="users" class="mat-elevation-z8 w-100">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>Azonosító</th>
+      <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef>Felhasználónév</th>
+      <td mat-cell *matCellDef="let element; let i = index">
+        <mat-form-field floatLabel="never">
+          <input
+            matInput
+            [value]="element.userName"
+            [(ngModel)]="element.userName"
+            [readonly]="currentlyEditedIndex !== i"
+            (click)="setCurrentlyEditedIndex(i)"
+          />
+        </mat-form-field>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="save">
+      <th mat-header-cell *matHeaderCellDef width="20%"></th>
+      <td mat-cell *matCellDef="let element; let i = index">
+        <button
+          mat-raised-button
+          *ngIf="currentlyEditedIndex === i"
+          (click)="saveEdit(element.id, element.userName)"
+        >
+          Mentés
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>

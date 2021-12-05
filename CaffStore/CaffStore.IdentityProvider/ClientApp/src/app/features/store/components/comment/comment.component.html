@@ -1,0 +1,8 @@
+<div class="alert alert-primary">
+  <strong
+    >{{ comment.username }} írta
+    {{ comment.createdAt | date: "yyyy. MM. dd. H:mm" }}-kor</strong
+  >
+  <mat-divider></mat-divider>
+  <div>{{ comment.content }}</div>
+</div>

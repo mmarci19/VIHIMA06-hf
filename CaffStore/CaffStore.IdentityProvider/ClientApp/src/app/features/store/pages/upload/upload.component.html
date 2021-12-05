@@ -1,0 +1,22 @@
+<div class="row" style="margin-bottom: 15px">
+  <h2>Fájl feltöltése</h2>
+  <div class="col-md-3">
+    <input
+      type="file"
+      #file
+      placeholder="Choose file"
+      (change)="uploadFile(file.files)"
+      style="display: none"
+      accept=".caff"
+    />
+    <button type="button" class="btn btn-success" (click)="file.click()">
+      Kiválasztás
+    </button>
+  </div>
+  <div class="col-md-4">
+    <span *ngIf="progress > 0" class="upload"> {{ progress }}% </span>
+    <span class="upload">
+      {{ message }}
+    </span>
+  </div>
+</div>
